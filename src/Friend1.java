@@ -38,16 +38,6 @@ public class Friend1 {
             xpos = xpos + dx;
             ypos = ypos + dy;
 
-//        if (xpos > 1000 - width || xpos < 0) {
-//            dx = -dx;
-//        } // right/left bounce
-//
-//        if (ypos < 0 || ypos + height > 700) {
-//            dy = -dy;
-            // up/down bounce
-
-//        dy=dy+1;
-
             if (xpos<0){
                 xpos = 1;
             }
