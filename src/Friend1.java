@@ -11,7 +11,7 @@ public class Friend1 {
         public int dy;                    //the speed of the hero in the y direction
         public Rectangle rec;
         public Image pic;
-        public boolean jumping;
+        public int score;
 
 
         // movement booleans
@@ -20,16 +20,18 @@ public class Friend1 {
         public boolean left;
         public boolean up;
 
-        public Friend1 (int pXpos, int pYpos, int dxParameter, int dyParameter) {
+        public Friend1 (int pwidth, int pheight, int pXpos, int pYpos, int dxParameter, int dyParameter, int pScore) {
 
             xpos = pXpos;
             ypos = pYpos;
-            width = 100;
-            height = 100;
+            width = pwidth;
+            height = pheight;
             dx = dxParameter;
             dy = dyParameter;
             isAlive = true;
             rec = new Rectangle(xpos, ypos, width, height);
+            score = pScore;
+
 
         } // constructor
 
@@ -50,13 +52,11 @@ public class Friend1 {
                 ypos = 1;
             }
 
-            if (ypos > 700-height){
-                ypos = 700-height;
+            if (ypos > 800-height){
+                ypos = 800-height;
             }
 
             rec = new Rectangle(xpos, ypos, width, height);
         }
 
     }
-
-}
