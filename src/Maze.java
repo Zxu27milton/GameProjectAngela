@@ -48,11 +48,11 @@ public class Maze {
         }
     }
 
-    public void draw(Graphics2D g){
+    public void draw(Graphics2D g, int yposition){ //pasted part of this from the hackathon
         g.setColor(Color.white);
         for (int i = 0; i < walls.length; i++) {
             if (walls[i] != null) {
-                g.fillRect(walls[i].xpos, walls[i].ypos, walls[i].width, walls[i].height);
+                g.fillRect(walls[i].xpos, walls[i].ypos+yposition, walls[i].width, walls[i].height);
             }
         }
     }

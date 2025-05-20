@@ -24,8 +24,8 @@ public class Gem {
 
         xpos = pXpos;
         ypos = pYpos;
-        width = 20;
-        height = 20;
+        width = 10;
+        height = 10;
         dx = dxParameter;
         dy = dyParameter;
         isAlive = true;

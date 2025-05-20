@@ -58,4 +58,8 @@ public boolean right;
         rec = new Rectangle(xpos, ypos, width, height);
     }
 
+    public Rectangle getNextRectangle() {
+        return new Rectangle(rec.x + dx, rec.y + dy, rec.width, rec.height);
+    }
+
 }

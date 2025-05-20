@@ -59,4 +59,9 @@ public class Friend1 {
             rec = new Rectangle(xpos, ypos, width, height);
         }
 
+    public Rectangle getNextRectangle() {
+        // Example: if Angela moves using dx and dy per frame
+        return new Rectangle(rec.x + dx, rec.y + dy, rec.width, rec.height);
+    }
+
     }

@@ -1,141 +1,263 @@
-import java.awt.image.BufferStrategy;
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferStrategy;
 import javax.swing.*;
 
-import java.awt.event.*;
-
 public class MaskWorld implements Runnable, KeyListener {
-    //Sets the width and height of the program window
+
+    //Creating the start screen
+    public boolean startscreen = true;
+    public Image StartScreenImage;
+
+    // Sets the width and height of the program window
     final int WIDTH = 1000;
     final int HEIGHT = 800;
 
-    //Declare the variables needed for the graphics
+    // Declare the variables needed for the graphics
     public JFrame frame;
     public Canvas canvas;
     public JPanel panel;
     public BufferStrategy bufferStrategy;
 
-    public boolean gameStart = false;
+    //When all gems are collected or characters die
+    public boolean gameOver = false;
 
-    //Declare the character objects
+    public Rectangle wallTemp = new Rectangle(0, 0, 0, 0);
+
+    // Declare the character objects
     public Friend1 Angela;
     public Friend2 Mia;
 
-    //set up the theme music soundtrack
+    // Set up the theme music soundtrack
     public SoundFile themeMusic;
 
-    //set up the maze
-    public Maze randomMaze;
+    // Set up the maze
+    public Maze AngelarandomMaze;
+    public Maze MiarandomMaze;
 
-    //Set up array
+    // Set up arrays
     public Gem[][] manyGemsAngela;
-    public Gem[] manyGemsMia;
+    public Gem[][] manyGemsMia;
 
-    public boolean gameOver = false;
+    // Set up something to count how many gems are made so the gameover code is easier to write
+    public int totalAliveAngelaGems = 0;
+    public int totalAliveMiaGems = 0;
+
+    //Declare the spikes as obstacles
+    public Spikes [] Angelaspike;
+    public Spikes [] Miaspike;
 
     public static void main(String[] args) {
-        MaskWorld myApp = new MaskWorld();   //creates a new instance of the game
-        new Thread(myApp).start();               //creates a threads & starts up the code in the run( ) method
+        MaskWorld myApp = new MaskWorld();
+        new Thread(myApp).start();
     }
 
     public MaskWorld() {
-
         setUpGraphics();
 
-        //setting up the maze
-        randomMaze = new Maze();
-        randomMaze.createWalls();
+        // Setting up the mazes
+        AngelarandomMaze = new Maze();
+        AngelarandomMaze.createWalls();
 
-        Angela = new Friend1(30, 30, 800, 710, 0, 0, 0);
-        Mia = new Friend2(30, 30, 710, 800, 0, 0, 0);
-        // STEP 2 ARRAY
+        MiarandomMaze = new Maze();
+        MiarandomMaze.createWalls();
+
+        // Set up players
+        Angela = new Friend1(20, 20, 10, 60, 0, 0, 0);
+        Mia = new Friend2(20, 20, 10, 460, 0, 0, 0);
+
+        // Gem Array 1 for Angela
         manyGemsAngela = new Gem[16][8];
         for (int i = 0; i < manyGemsAngela.length; i++) {
             for (int z = 0; z < manyGemsAngela[0].length; z++) {
-                if (randomMaze.mazeLayout[i][z] == 0){
-                    manyGemsAngela[i][z] = new Gem((i)*50+10, (z)*50+10, 0, 0);
-                } else {
-                    manyGemsAngela[i][z] = new Gem((i)*50+10, (z)*50+10, 0, 0);
+                manyGemsAngela[i][z] = new Gem(i * 50 + 10, z * 50 + 10, 0, 0);
+
+                // Disable gem if it's in a wall
+                if (AngelarandomMaze.mazeLayout[i][z] == 1) {
                     manyGemsAngela[i][z].isAlive = false;
                 }
+
+                // Disable gem if it's overlapping Angela
+                if (Math.abs(manyGemsAngela[i][z].xpos - Angela.xpos) <= Angela.width &&
+                        Math.abs(manyGemsAngela[i][z].ypos - Angela.ypos) <= Angela.height) {
+                    manyGemsAngela[i][z].isAlive = false;
+                }
+
+                // Count only alive gems
+                if (manyGemsAngela[i][z].isAlive) {
+                    totalAliveAngelaGems++;
+                }
             }
-            //make second array for the other character -> An array for each character
-        }
-        manyGemsMia = new Gem[5];
-        for (int i = 0; i < manyGemsMia.length; i++) {
-            manyGemsMia[i] = new Gem((i*100)+500, 550, 0, 0);
-            //make second array for the other character -> An array for each character
         }
 
-        //STEP 3: Make pics for array
+        // Gem Array 2 for Mia, same as above so didn't re-comment
+        manyGemsMia = new Gem[16][8];
+        for (int i = 0; i < manyGemsMia.length; i++) {
+            for (int z = 0; z < manyGemsMia[0].length; z++) {
+                manyGemsMia[i][z] = new Gem(i * 50 + 10, z * 50 + 410, 0, 0);
+                if (MiarandomMaze.mazeLayout[i][z] == 1) {
+                    manyGemsMia[i][z].isAlive = false;
+                }
+                if (Math.abs(manyGemsMia[i][z].xpos - Mia.xpos) <= Mia.width &&
+                        Math.abs(manyGemsMia[i][z].ypos - Mia.ypos) <= Mia.height) {
+                    manyGemsMia[i][z].isAlive = false;
+                }
+                if (manyGemsMia[i][z].isAlive) {
+                    totalAliveMiaGems++;
+                }
+            }
+        }
+
+        // Load images
         Angela.pic = Toolkit.getDefaultToolkit().getImage("Angela.png");
         Mia.pic = Toolkit.getDefaultToolkit().getImage("Mia.png");
+
         for (int i = 0; i < manyGemsAngela.length; i++) {
             for (int z = 0; z < manyGemsAngela[0].length; z++) {
                 manyGemsAngela[i][z].pic = Toolkit.getDefaultToolkit().getImage("Angelagem.png");
             }
         }
+
         for (int i = 0; i < manyGemsMia.length; i++) {
-            manyGemsMia[i].pic = Toolkit.getDefaultToolkit().getImage("Miagem.png");
+            for (int z = 0; z < manyGemsMia[0].length; z++) {
+                manyGemsMia[i][z].pic = Toolkit.getDefaultToolkit().getImage("Miagem.png");
+            }
         }
 
-        //setting up and playing the theme music
+         //Setting up and playing the theme music
         themeMusic = new SoundFile("Thememusic.wav");
-//        themeMusic.loop();
+        themeMusic.loop();
 
+        //Set up start screen imagery
+        StartScreenImage = Toolkit.getDefaultToolkit().getImage("StartScreen.jpeg");
     }
 
-    //*******************************************************************************
+    public void restartGame(){
+        gameOver = false;
+        resetCharactersandScoresandGems();
+        render();
+    }
 
-    // this is the code that plays the game after you set things up
+    public void resetCharactersandScoresandGems(){
+        //just re-copied most of MaskWorld so everything would reset
+        //Reset players
+        Angela = new Friend1(20, 20, 10, 60, 0, 0, 0);
+        Mia = new Friend2(20, 20, 10, 460, 0, 0, 0);
+
+        //Reset scores
+        Angela.score = 0;
+        Mia.score = 0;
+
+        //Reset gems
+        totalAliveAngelaGems = 0;
+        totalAliveMiaGems = 0;
+
+        manyGemsAngela = new Gem[16][8];
+        for (int i = 0; i < manyGemsAngela.length; i++) {
+            for (int z = 0; z < manyGemsAngela[0].length; z++) {
+                manyGemsAngela[i][z] = new Gem(i * 50 + 10, z * 50 + 10, 0, 0);
+                if (AngelarandomMaze.mazeLayout[i][z] == 1 ||
+                        Math.abs(manyGemsAngela[i][z].xpos - Angela.xpos) <= Angela.width &&
+                                Math.abs(manyGemsAngela[i][z].ypos - Angela.ypos) <= Angela.height) {
+                    manyGemsAngela[i][z].isAlive = false;
+                } else {
+                    manyGemsAngela[i][z].isAlive = true;
+                    totalAliveAngelaGems++;
+                }
+            }
+        }
+
+        manyGemsMia = new Gem[16][8];
+        for (int i = 0; i < manyGemsMia.length; i++) {
+            for (int z = 0; z < manyGemsMia[0].length; z++) {
+                manyGemsMia[i][z] = new Gem(i * 50 + 10, z * 50 + 410, 0, 0);
+                if (MiarandomMaze.mazeLayout[i][z] == 1 ||
+                        Math.abs(manyGemsMia[i][z].xpos - Mia.xpos) <= Mia.width &&
+                                Math.abs(manyGemsMia[i][z].ypos - Mia.ypos) <= Mia.height) {
+                    manyGemsMia[i][z].isAlive = false;
+                } else {
+                    manyGemsMia[i][z].isAlive = true;
+                    totalAliveMiaGems++;
+                }
+            }
+        }
+
+        Angela.pic = Toolkit.getDefaultToolkit().getImage("Angela.png");
+        Mia.pic = Toolkit.getDefaultToolkit().getImage("Mia.png");
+
+        for (int i = 0; i < manyGemsAngela.length; i++) {
+            for (int z = 0; z < manyGemsAngela[0].length; z++) {
+                manyGemsAngela[i][z].pic = Toolkit.getDefaultToolkit().getImage("Angelagem.png");
+            }
+        }
+
+        for (int i = 0; i < manyGemsMia.length; i++) {
+            for (int z = 0; z < manyGemsMia[0].length; z++) {
+                manyGemsMia[i][z].pic = Toolkit.getDefaultToolkit().getImage("Miagem.png");
+            }
+        }
+    }
+
     public void run() {
         while (true) {
-            if (gameOver == false) {
-                moveThings();
-                //move all the game objects
+            if (startscreen == true){
+                renderstartscreen();
+            } else {
+                if (gameOver == false) {
+                    moveThings(); // Move all the game objects
+                }
+                checkIntersections();   // Check character collisions
+                render(); // Paint graphics & report the score
             }
-            checkIntersections();   // check character crashes
-            render();               // paint the graphics & report the score
-            pause(20);
-            checkKeys();// sleep for 20 ms
-        }
-    }
-
-    public void checkKeys() {
-        if (Angela.up == true) {
-            Angela.dy = -4;
-        } else if (Angela.down == true) {
-            Angela.dy = 4;
-        } else {
-            Angela.dy = 0;
-        }
-        if (Angela.left == true) {
-            Angela.dx = -4;
-        } else if (Angela.right == true) {
-            Angela.dx = 4;
-        } else {
-            Angela.dx = 0;
-        }
-
-        if (Mia.up == true) {
-            Mia.dy = -4;
-        } else if (Mia.down == true) {
-            Mia.dy = 4;
-        } else {
-            Mia.dy = 0;
-        }
-        if (Mia.left == true) {
-            Mia.dx = -4;
-        } else if (Mia.right == true) {
-            Mia.dx = 4;
-        } else {
-            Mia.dx = 0;
+                pause(20);
+                checkKeys();
         }
     }
 
     public void moveThings() {
-        Angela.move();
-        Mia.move();
+        boolean AngelawillCollide = false;
+        boolean MiawillCollide = false;
+
+        Rectangle AngelanextPosition = Angela.getNextRectangle();
+        Rectangle MianextPosition = Mia.getNextRectangle();
+
+        for (int i = 0; i < AngelarandomMaze.mazeLayout.length; i++) {
+            for (int z = 0; z < AngelarandomMaze.mazeLayout[0].length; z++) {
+                if (AngelarandomMaze.mazeLayout[i][z] == 1) {
+                    Rectangle wallTemp = new Rectangle(i * 50, z * 50, 50, 50);
+                    if (AngelanextPosition.intersects(wallTemp)) {
+                        AngelawillCollide = true;
+                        break; //means stop nearest loop
+                    }
+                }
+            }
+            if (AngelawillCollide) break;
+        }
+
+        for (int i = 0; i < MiarandomMaze.mazeLayout.length; i++) {
+            for (int z = 0; z < MiarandomMaze.mazeLayout[0].length; z++) {
+                if (MiarandomMaze.mazeLayout[i][z] == 1) {
+                    Rectangle wallTemp = new Rectangle(i * 50, z * 50 + 400, 50, 50);
+                    if (MianextPosition.intersects(wallTemp)) {
+                        MiawillCollide = true;
+                        break;
+                    }
+                }
+            }
+            if (MiawillCollide) break;
+        }
+
+        if (AngelawillCollide == false) {
+            Angela.move();
+        } else {
+            System.out.println("Angela is touching a wall and cannot move");
+        }
+
+        if (MiawillCollide == false){
+            Mia.move();
+        } else {
+            System.out.println("Mia is touching a wall and cannot move");
+        }
     }
 
     public void checkIntersections() {
@@ -144,175 +266,185 @@ public class MaskWorld implements Runnable, KeyListener {
                 if (Angela.rec.intersects(manyGemsAngela[i][z].rec)) {
                     if (manyGemsAngela[i][z].isAlive) {
                         manyGemsAngela[i][z].isAlive = false;
-                        Angela.score = Angela.score + 1;
-                        new SoundFile("gemCollect.wav").play(); //allows the gem collect sound to overlap
-                        // if the player is collecting gems really quickly
-                        // because just using the variable does not allow for overlap
+                        Angela.score++;
+                        new SoundFile("gemCollect.wav").play();
                     }
                 }
-//            if (Mia.rec.intersects(manyGemsMia[i].rec)) {
-//                if (manyGemsMia[i].isAlive) {
-//                    manyGemsMia[i].isAlive = false;
-//                    Mia.score = Mia.score + 1;
-//                    new SoundFile("gemCollect.wav").play();
-//                }
-//            }
+            }
+        }
+
+        for (int i = 0; i < manyGemsMia.length; i++) {
+            for (int z = 0; z < manyGemsMia[0].length; z++) {
+                if (Mia.rec.intersects(manyGemsMia[i][z].rec)) {
+                    if (manyGemsMia[i][z].isAlive) {
+                        manyGemsMia[i][z].isAlive = false;
+                        Mia.score++;
+                        new SoundFile("gemCollect.wav").play();
+                    }
+                }
             }
         }
     }
 
-    //paints things on the screen using bufferStrategy
+    public void renderstartscreen(){
+        Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
+        g.drawImage(StartScreenImage, 0,0, WIDTH, HEIGHT, null);
+        g.dispose();
+        bufferStrategy.show();
+    }
+
     public void render() {
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
-        //background color
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
-        //font information for scoreboard
-        Font font = new Font("SansSerif", Font.BOLD,16);
+        Font font = new Font("SansSerif", Font.BOLD, 16);
         g.setFont(font);
         g.setColor(Color.white);
-        g.drawString("Player 1: " + String.valueOf(Angela.score), 875, 100);
-        g.drawString("Player 2: " + String.valueOf(Mia.score), 875, 150);
+        g.drawString("Player 1: " + Angela.score, 875, 100);
+        g.drawString("Player 2: " + Mia.score, 875, 150);
 
+        AngelarandomMaze.draw(g, 0);
+        MiarandomMaze.draw(g, 400);
 
-        // draw characters to the screen (only draw if they are alive)
-        if (Mia.isAlive == true) {
-            g.drawImage(Mia.pic, Mia.xpos, Mia.ypos, Mia.width, Mia.height, null);
-        }
         for (int i = 0; i < manyGemsAngela.length; i++) {
             for (int z = 0; z < manyGemsAngela[0].length; z++) {
                 if (manyGemsAngela[i][z].isAlive) {
-                    g.drawImage(manyGemsAngela[i][z].pic, manyGemsAngela[i][z].xpos, manyGemsAngela[i][z].ypos, manyGemsAngela[i][z].width,
-                            manyGemsAngela[i][z].height, null);
+                    g.drawImage(manyGemsAngela[i][z].pic, manyGemsAngela[i][z].xpos, manyGemsAngela[i][z].ypos,
+                            manyGemsAngela[i][z].width, manyGemsAngela[i][z].height, null);
                 }
             }
         }
+
         for (int i = 0; i < manyGemsMia.length; i++) {
-            if (manyGemsMia[i].isAlive) {
-                g.drawImage(manyGemsMia[i].pic, manyGemsMia[i].xpos, manyGemsMia[i].ypos, manyGemsMia[i].width,
-                        manyGemsMia[i].height, null);
+            for (int z = 0; z < manyGemsMia[0].length; z++){
+                if (manyGemsMia[i][z].isAlive) {
+                    g.drawImage(manyGemsMia[i][z].pic, manyGemsMia[i][z].xpos, manyGemsMia[i][z].ypos,
+                            manyGemsMia[i][z].width, manyGemsMia[i][z].height, null);
+                }
             }
         }
-        if (Angela.isAlive == true) {
+
+
+        if (Mia.isAlive) {
+            g.drawImage(Mia.pic, Mia.xpos, Mia.ypos, Mia.width, Mia.height, null);
+        }
+
+        if (Angela.isAlive) {
             g.drawImage(Angela.pic, Angela.xpos, Angela.ypos, Angela.width, Angela.height, null);
         }
 
-
-        //gameOver information
-        if (Angela.score == manyGemsAngela.length*manyGemsAngela[0].length || Mia.score == manyGemsMia.length){
+        if (Angela.score == totalAliveAngelaGems || Mia.score == totalAliveMiaGems) {
             gameOver = true;
         }
-        if (gameOver == true) {
+
+        if (gameOver) {
             g.setFont(font);
-            g.setColor(new Color (250,250,250));
+            g.setColor(new Color(250, 250, 250));
             g.drawString("Gameover", 875, 450);
-            if (Angela.score > Mia.score){
-                g.setFont(font);
-                g.setColor(new Color (189,227,250));
+
+            if (Angela.score > Mia.score) {
+                g.setColor(new Color(189, 227, 250));
                 g.drawString("Player 1 Won", 875, 420);
-            }
-            if (Angela.score == Mia.score){
-                g.setFont(font);
-                g.setColor(new Color (250,250,250));
+            } else if (Angela.score == Mia.score) {
                 g.drawString("You tied", 875, 420);
-            }
-            if (Mia.score > Angela.score) {
-                g.setFont(font);
-                g.setColor(new Color (250,230,250));
+            } else {
+                g.setColor(new Color(250, 230, 250));
                 g.drawString("Player 2 Won", 875, 420);
             }
         }
 
-        //drawing out the maze
-        randomMaze.draw(g);
-
         g.dispose();
         bufferStrategy.show();
-
     }
 
-    //Graphics setup method
     public void setUpGraphics() {
+        frame = new JFrame("MaskWorld");
+        panel = (JPanel) frame.getContentPane();
+        panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        panel.setLayout(null);
 
-        frame = new JFrame("MaskWorld");   //Create the program window or frame.  Names it.
-
-        panel = (JPanel) frame.getContentPane();  //sets up a JPanel which is what goes in the frame
-        panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));  //sizes the JPanel
-        panel.setLayout(null);   //set the layout
-
-        // creates a canvas which is a blank rectangular area of the screen onto which the application can draw
-        // and trap input events (Mouse and Keyboard events)
         canvas = new Canvas();
         canvas.setBounds(0, 0, WIDTH, HEIGHT);
         canvas.setIgnoreRepaint(true);
 
-        panel.add(canvas);  // adds the canvas to the panel.
+        panel.add(canvas);
 
-        // frame operations
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //makes the frame close and exit nicely
-        frame.pack();  //adjusts the frame and its contents so the sizes are at their default or larger
-        frame.setResizable(false);   //makes it so the frame cannot be resized
-        frame.setVisible(true);      //IMPORTANT!!!  if the frame is not set to visible it will not appear on the screen!
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setVisible(true);
 
-        // sets up things so the screen displays images nicely.
         canvas.createBufferStrategy(2);
         bufferStrategy = canvas.getBufferStrategy();
         canvas.requestFocus();
+
         System.out.println("DONE graphic setup");
 
         canvas.addKeyListener(this);
     }
 
-    //Pauses or sleeps the computer for the amount specified in milliseconds
     public void pause(int time) {
-        //sleep
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
+            // Ignore
+        }
+    }
 
+    public void checkKeys() {
+        if (Angela.up) {
+            Angela.dy = -4;
+        } else if (Angela.down) {
+            Angela.dy = 4;
+        } else {
+            Angela.dy = 0;
+        }
+        if (Angela.left) {
+            Angela.dx = -4;
+        } else if (Angela.right) {
+            Angela.dx = 4;
+        } else {
+            Angela.dx = 0;
+        }
+
+        if (Mia.up) {
+            Mia.dy = -4;
+        } else if (Mia.down) {
+            Mia.dy = 4;
+        } else {
+            Mia.dy = 0;
+        }
+        if (Mia.left) {
+            Mia.dx = -4;
+        } else if (Mia.right) {
+            Mia.dx = 4;
+        } else {
+            Mia.dx = 0;
         }
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
+    public void keyTyped(KeyEvent e) {}
 
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
         System.out.println("key code: " + keyCode);
 
-        if (keyCode == 38) {
-            Angela.up = true;
-        }
-        if (keyCode == 40) {
-            Angela.down = true;
-        }
-        if (keyCode == 37) {
-            Angela.left = true;
-        }
+        if (keyCode == 38) Angela.up = true;
+        if (keyCode == 40) Angela.down = true;
+        if (keyCode == 37) Angela.left = true;
+        if (keyCode == 39) Angela.right = true;
 
-        if (keyCode == 39) {
-            Angela.right = true;
-        }
+        if (keyCode == 87) Mia.up = true;
+        if (keyCode == 83) Mia.down = true;
+        if (keyCode == 65) Mia.left = true;
+        if (keyCode == 68) Mia.right = true;
 
-        if (keyCode == 87) {
-            Mia.up = true;
-        }
-        if (keyCode == 83) {
-            Mia.down = true;
-        }
-        if (keyCode == 65) {
-            Mia.left = true;
-        }
+        if (keyCode == 32) startscreen = false;
 
-        if (keyCode == 68) {
-            Mia.right = true;
-        }
-
-        if (keyCode == 32) {
-            Angela.dy = -15;
+        if (keyCode == 10 && gameOver == true) {
+            restartGame();
         }
     }
 
@@ -320,34 +452,14 @@ public class MaskWorld implements Runnable, KeyListener {
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
-        if (keyCode == 38) {
-            Angela.up = false;
-        }
+        if (keyCode == 38) Angela.up = false;
+        if (keyCode == 40) Angela.down = false;
+        if (keyCode == 37) Angela.left = false;
+        if (keyCode == 39) Angela.right = false;
 
-        if (keyCode == 40) {
-            Angela.down = false;
-        }
-
-        if (keyCode == 37) {
-            Angela.left = false;
-        }
-
-        if (keyCode == 39) {
-            Angela.right = false;
-        }
-
-        if (keyCode == 87) {
-            Mia.up = false;
-        }
-        if (keyCode == 83) {
-            Mia.down = false;
-        }
-        if (keyCode == 65) {
-            Mia.left = false;
-        }
-
-        if (keyCode == 68) {
-            Mia.right = false;
-        }
+        if (keyCode == 87) Mia.up = false;
+        if (keyCode == 83) Mia.down = false;
+        if (keyCode == 65) Mia.left = false;
+        if (keyCode == 68) Mia.right = false;
     }
 }
