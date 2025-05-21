@@ -1,5 +1,3 @@
-//Cheese class
-//Bounces
 
 import java.awt.*;
 
@@ -9,6 +7,7 @@ public class Spikes {
     public int ypos;                //the y position
     public int width;
     public int height;
+    public boolean isAlive;
     public Rectangle rec;
     public Image pic;
 
@@ -18,6 +17,7 @@ public class Spikes {
         ypos = pYpos;
         width = pwidth;
         height = pheight;
+        isAlive = true;
         rec = new Rectangle(xpos, ypos, width, height);
 
 

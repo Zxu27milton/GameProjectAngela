@@ -13,7 +13,6 @@ public class Friend1 {
         public Image pic;
         public int score;
 
-
         // movement booleans
         public boolean right;
         public boolean down;
@@ -21,7 +20,6 @@ public class Friend1 {
         public boolean up;
 
         public Friend1 (int pwidth, int pheight, int pXpos, int pYpos, int dxParameter, int dyParameter, int pScore) {
-
             xpos = pXpos;
             ypos = pYpos;
             width = pwidth;
@@ -31,9 +29,7 @@ public class Friend1 {
             isAlive = true;
             rec = new Rectangle(xpos, ypos, width, height);
             score = pScore;
-
-
-        } // constructor
+        }
 
         //move( ) method for a keyboard controlled character
         public void move() {
@@ -60,7 +56,7 @@ public class Friend1 {
         }
 
     public Rectangle getNextRectangle() {
-        // Example: if Angela moves using dx and dy per frame
+        // Example: if Angela moves using dx and dy per frame, the next rectangle would be + that
         return new Rectangle(rec.x + dx, rec.y + dy, rec.width, rec.height);
     }
 

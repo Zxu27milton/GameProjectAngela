@@ -14,14 +14,12 @@ public class Friend2 {
     public int score;
 
 
-    // movement booleans
-public boolean right;
+    public boolean right;
     public boolean down;
     public boolean left;
     public boolean up;
 
     public Friend2 (int pwidth, int pheight, int pXpos, int pYpos, int dxParameter, int dyParameter, int pScore) {
-
         xpos = pXpos;
         ypos = pYpos;
         width = pwidth;
@@ -31,10 +29,8 @@ public boolean right;
         isAlive = true;
         rec = new Rectangle(xpos, ypos, width, height);
         score = pScore;
+    }
 
-    } // constructor
-
-    //move( ) method for a keyboard controlled character
     public void move() {
         xpos = xpos + dx;
         ypos = ypos + dy;
