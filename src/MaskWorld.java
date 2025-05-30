@@ -145,6 +145,7 @@ public class MaskWorld implements Runnable, KeyListener {
     }
 
     public void level2() {
+        gameOver = false;
         resetCharactersandScoresandGems();
         render();
     }
@@ -388,7 +389,7 @@ public class MaskWorld implements Runnable, KeyListener {
                         themeMusic.pause();
                         if (mia.isAlive) {
                             new SoundFile("Death.wav").play();
-                            angela.isAlive = false;
+                            mia.isAlive = false;
                         }
                     }
                 }
@@ -481,7 +482,7 @@ public class MaskWorld implements Runnable, KeyListener {
 
             g.setFont(font2);
             g.drawString("Restart: Return", 850, 470);
-            g.drawString("Next Level: Shift", 850, 490);
+            g.drawString("Next Level: Control", 850, 490);
 
             g.setFont(font1);
             if (angela.score > mia.score) {
@@ -590,7 +591,7 @@ public class MaskWorld implements Runnable, KeyListener {
             restartGame();
         }
 
-        if (keyCode == 16) {
+        if (keyCode == 17 && gameOver == true) {
             levels++;
             if (levels == 1){
                 level2();
