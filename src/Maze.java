@@ -1,3 +1,4 @@
+import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 
 public class Maze {
@@ -53,6 +54,7 @@ public class Maze {
         for (int i = 0; i < walls.length; i++) {
             if (walls[i] != null) {
                 g.fillRect(walls[i].xpos, walls[i].ypos+yposition, walls[i].width, walls[i].height);
+                g.setColor(Color.white);
             }
         }
     }

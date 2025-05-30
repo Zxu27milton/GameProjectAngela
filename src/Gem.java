@@ -15,8 +15,8 @@ public class Gem {
 
         xpos = pXpos;
         ypos = pYpos;
-        width = 10;
-        height = 10;
+        width = 15;
+        height = 15;
         isAlive = true;
         rec = new Rectangle(xpos, ypos, width, height);
 

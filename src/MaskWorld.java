@@ -7,7 +7,7 @@ public class MaskWorld implements Runnable, KeyListener {
 
     //Creating the start screen
     public boolean startscreen = true;
-    public Image StartScreenImage;
+    public Image startScreenImage;
 
     // Sets the width and height of the program window
     final int WIDTH = 1000;
@@ -25,15 +25,15 @@ public class MaskWorld implements Runnable, KeyListener {
     public Rectangle wallTemp = new Rectangle(0, 0, 0, 0);
 
     // Declare the character objects
-    public Friend1 Angela;
-    public Friend2 Mia;
+    public Friend1 angela;
+    public Friend2 mia;
 
     // Set up the theme music soundtrack
     public SoundFile themeMusic;
 
     // Set up the maze
-    public Maze AngelarandomMaze;
-    public Maze MiarandomMaze;
+    public Maze angelaRandomMaze;
+    public Maze miaRandomMaze;
 
     // Set up arrays
     public Gem[][] manyGemsAngela;
@@ -44,8 +44,8 @@ public class MaskWorld implements Runnable, KeyListener {
     public int totalAliveMiaGems = 0;
 
     // Declare the spikes as obstacles
-    public Spikes [] Angelaspike;
-    public Spikes [] Miaspike;
+    public Spikes[] angelaSpike;
+    public Spikes[] miaSpike;
 
     // Set up the levels
     public int levels;
@@ -59,27 +59,15 @@ public class MaskWorld implements Runnable, KeyListener {
         setUpGraphics();
 
         // Setting up the mazes
-        AngelarandomMaze = new Maze();
-        AngelarandomMaze.createWalls();
+        angelaRandomMaze = new Maze();
+        angelaRandomMaze.createWalls();
 
-        MiarandomMaze = new Maze();
-        MiarandomMaze.createWalls();
+        miaRandomMaze = new Maze();
+        miaRandomMaze.createWalls();
 
         // Set up players
-        Angela = new Friend1(20, 20, 10, 60, 0, 0, 0);
-        Mia = new Friend2(20, 20, 10, 460, 0, 0, 0);
-
-        // Spike Array for Angela
-        Angelaspike = new Spikes[20];
-        for (int i = 0; i < Angelaspike.length; i++) {
-            int randomInt1 = (int) (Math.random() * 1000 + 1);
-            Angelaspike[i] = new Spikes(randomInt1, i * 50 + 10, 10, 10);
-            if (Math.abs(Angelaspike[i].xpos - Angela.xpos) <= Angela.width &&
-                    Math.abs(Angelaspike[i].ypos - Angela.ypos) <= Angela.height) {
-                Angelaspike[i].isAlive = false;
-            }
-            System.out.println("spike x pos " + randomInt1);
-        }
+        angela = new Friend1(20, 20, 10, 60, 0, 0, 0);
+        mia = new Friend2(20, 20, 10, 460, 0, 0, 0);
 
         // Gem Array 1 for Angela
         manyGemsAngela = new Gem[16][8];
@@ -88,14 +76,13 @@ public class MaskWorld implements Runnable, KeyListener {
                 manyGemsAngela[i][z] = new Gem(i * 50 + 10, z * 50 + 10);
 
                 // Disable gem if it's in a wall
-                if (AngelarandomMaze.mazeLayout[i][z] == 1) {
+                if (angelaRandomMaze.mazeLayout[i][z] == 1) {
                     manyGemsAngela[i][z].isAlive = false;
-                    Angelaspike[i].isAlive = false;
                 }
 
                 // Disable gem if it's overlapping Angela
-                if (Math.abs(manyGemsAngela[i][z].xpos - Angela.xpos) <= Angela.width &&
-                        Math.abs(manyGemsAngela[i][z].ypos - Angela.ypos) <= Angela.height) {
+                if (Math.abs(manyGemsAngela[i][z].xpos - angela.xpos) <= angela.width &&
+                        Math.abs(manyGemsAngela[i][z].ypos - angela.ypos) <= angela.height) {
                     manyGemsAngela[i][z].isAlive = false;
                 }
 
@@ -106,28 +93,16 @@ public class MaskWorld implements Runnable, KeyListener {
             }
         }
 
-        //Spike Array for Mia
-        Miaspike = new Spikes[20];
-        for (int i = 0; i < Angelaspike.length; i++) {
-            int randomInt2 = (int) (Math.random() * 1000 + 1);
-            Miaspike[i] = new Spikes(randomInt2, i * 50 + 10, 10, 10);
-            if (Math.abs(Miaspike[i].xpos - Mia.xpos) <= Mia.width &&
-                    Math.abs(Miaspike[i].ypos - Mia.ypos) <= Mia.height) {
-                Miaspike[i].isAlive = false;
-            }
-        }
-
         // Gem Array 2 for Mia, same as above so didn't re-comment
         manyGemsMia = new Gem[16][8];
         for (int i = 0; i < manyGemsMia.length; i++) {
             for (int z = 0; z < manyGemsMia[0].length; z++) {
                 manyGemsMia[i][z] = new Gem(i * 50 + 10, z * 50 + 410);
-                if (MiarandomMaze.mazeLayout[i][z] == 1) {
+                if (miaRandomMaze.mazeLayout[i][z] == 1) {
                     manyGemsMia[i][z].isAlive = false;
-                    Miaspike[i].isAlive = false;
                 }
-                if (Math.abs(manyGemsMia[i][z].xpos - Mia.xpos) <= Mia.width &&
-                        Math.abs(manyGemsMia[i][z].ypos - Mia.ypos) <= Mia.height) {
+                if (Math.abs(manyGemsMia[i][z].xpos - mia.xpos) <= mia.width &&
+                        Math.abs(manyGemsMia[i][z].ypos - mia.ypos) <= mia.height) {
                     manyGemsMia[i][z].isAlive = false;
                 }
                 if (manyGemsMia[i][z].isAlive) {
@@ -139,8 +114,8 @@ public class MaskWorld implements Runnable, KeyListener {
         // LOAD IMAGES
 
         // Character Images
-        Angela.pic = Toolkit.getDefaultToolkit().getImage("Angela.png");
-        Mia.pic = Toolkit.getDefaultToolkit().getImage("Mia.png");
+        angela.pic = Toolkit.getDefaultToolkit().getImage("Angela.png");
+        mia.pic = Toolkit.getDefaultToolkit().getImage("Mia.png");
 
         // Gem Images
         for (int i = 0; i < manyGemsAngela.length; i++) {
@@ -155,82 +130,52 @@ public class MaskWorld implements Runnable, KeyListener {
             }
         }
 
-        // Spike Images
-        for (int i = 0; i < Angelaspike.length; i++) {
-            Angelaspike[i].pic = Toolkit.getDefaultToolkit().getImage("Spikes.png");
-        }
-
-        for (int i = 0; i < Miaspike.length; i++) {
-            Miaspike[i].pic = Toolkit.getDefaultToolkit().getImage("Spikes.png");
-        }
-
         //Setting up and playing the theme music
         themeMusic = new SoundFile("Thememusic.wav");
         themeMusic.loop();
 
         //Set up start screen imagery
-        StartScreenImage = Toolkit.getDefaultToolkit().getImage("StartScreen.jpeg");
-
-        //What happens if characters die
-        if (Angela.isAlive == false){
-            gameOver = true;
-        }
-        if (Mia.isAlive == false){
-            gameOver = true;
-        }
+        startScreenImage = Toolkit.getDefaultToolkit().getImage("Startscreen.png");
     }
 
-    public void restartGame(){
+    public void restartGame() {
         gameOver = false;
         resetCharactersandScoresandGems();
         render();
     }
 
-    public void level2(){
+    public void level2() {
         resetCharactersandScoresandGems();
+        render();
     }
 
-    public void resetCharactersandScoresandGems(){
+    public void resetCharactersandScoresandGems() {
         //just re-copied most of MaskWorld so everything would reset
         //Reset players
-        Angela = new Friend1(20, 20, 10, 60, 0, 0, 0);
-        Mia = new Friend2(20, 20, 10, 460, 0, 0, 0);
+        angela = new Friend1(20, 20, 10, 60, 0, 0, 0);
+        mia = new Friend2(20, 20, 10, 460, 0, 0, 0);
 
         //Reset scores
-        Angela.score = 0;
-        Mia.score = 0;
+        angela.score = 0;
+        mia.score = 0;
 
         //Reset gems & Spikes
         totalAliveAngelaGems = 0;
         totalAliveMiaGems = 0;
-
-        // Spike Array for Angela
-        Angelaspike = new Spikes[20];
-        for (int i = 0; i < Angelaspike.length; i++) {
-            int randomInt1 = (int) (Math.random() * 1000 + 1);
-            Angelaspike[i] = new Spikes(randomInt1, i * 50 + 10, 10, 10);
-            if (Math.abs(Angelaspike[i].xpos - Angela.xpos) <= Angela.width &&
-                    Math.abs(Angelaspike[i].ypos - Angela.ypos) <= Angela.height) {
-                Angelaspike[i].isAlive = false;
-            }
-            System.out.println("spike x pos " + randomInt1);
-        }
 
         // Gem Array 1 for Angela
         manyGemsAngela = new Gem[16][8];
         for (int i = 0; i < manyGemsAngela.length; i++) {
             for (int z = 0; z < manyGemsAngela[0].length; z++) {
                 manyGemsAngela[i][z] = new Gem(i * 50 + 10, z * 50 + 10);
-
                 // Disable gem if it's in a wall
-                if (AngelarandomMaze.mazeLayout[i][z] == 1) {
+                if (angelaRandomMaze.mazeLayout[i][z] == 1) {
                     manyGemsAngela[i][z].isAlive = false;
-                    Angelaspike[i].isAlive = false;
                 }
 
                 // Disable gem if it's overlapping Angela
-                if (Math.abs(manyGemsAngela[i][z].xpos - Angela.xpos) <= Angela.width &&
-                        Math.abs(manyGemsAngela[i][z].ypos - Angela.ypos) <= Angela.height) {
+                if (Math.abs(manyGemsAngela[i][z].xpos - angela.xpos) <= angela.width &&
+                        Math.abs(manyGemsAngela[i][z].ypos - angela.ypos) <= angela.height) {
                     manyGemsAngela[i][z].isAlive = false;
                 }
 
@@ -241,14 +186,32 @@ public class MaskWorld implements Runnable, KeyListener {
             }
         }
 
-        //Spike Array for Mia
-        Miaspike = new Spikes[20];
-        for (int i = 0; i < Angelaspike.length; i++) {
-            int randomInt2 = (int) (Math.random() * 1000 + 1);
-            Miaspike[i] = new Spikes(randomInt2, i * 50 + 10, 10, 10);
-            if (Math.abs(Miaspike[i].xpos - Mia.xpos) <= Mia.width &&
-                    Math.abs(Miaspike[i].ypos - Mia.ypos) <= Mia.height) {
-                Miaspike[i].isAlive = false;
+        // Spike Array for Angela
+        angelaSpike = new Spikes[30];
+        for (int i = 0; i < angelaSpike.length; i++) {
+            int randomInt1 = (int) (Math.random() * 400 + 1);
+            int randomInt2 = (int) (Math.random() * 800 + 1);
+            angelaSpike[i] = new Spikes(randomInt2, randomInt1, 10, 10);
+            angelaSpike[i].pic = Toolkit.getDefaultToolkit().getImage("Spikes.png");
+            if (Math.abs(angelaSpike[i].xpos - angela.xpos) <= angela.width &&
+                    Math.abs(angelaSpike[i].ypos - angela.ypos) <= angela.height) {
+                angelaSpike[i].isAlive = false;
+            } else {
+                angelaSpike[i].isAlive = true;
+            }
+            for (int a = 0; a < angelaRandomMaze.walls.length; a++) {
+//                System.out.println("rec " + AngelarandomMaze.walls[a].rec);
+                if (angelaRandomMaze.walls[a] != null && angelaSpike[i].rec.intersects(angelaRandomMaze.walls[a].rec)) {
+//                    System.out.println("killing angela spike because in the wall");
+                    angelaSpike[i].isAlive = false;
+                }
+            }
+            for (int b = 0; b < manyGemsAngela.length; b++) {
+                for (int z = 0; z < manyGemsAngela[0].length; z++) {
+                    if (angelaSpike[i].rec.intersects(manyGemsAngela[b][z].rec)){
+                        angelaSpike[i].isAlive = false;
+                    }
+                }
             }
         }
 
@@ -257,12 +220,11 @@ public class MaskWorld implements Runnable, KeyListener {
         for (int i = 0; i < manyGemsMia.length; i++) {
             for (int z = 0; z < manyGemsMia[0].length; z++) {
                 manyGemsMia[i][z] = new Gem(i * 50 + 10, z * 50 + 410);
-                if (MiarandomMaze.mazeLayout[i][z] == 1) {
+                if (miaRandomMaze.mazeLayout[i][z] == 1) {
                     manyGemsMia[i][z].isAlive = false;
-                    Miaspike[i].isAlive = false;
                 }
-                if (Math.abs(manyGemsMia[i][z].xpos - Mia.xpos) <= Mia.width &&
-                        Math.abs(manyGemsMia[i][z].ypos - Mia.ypos) <= Mia.height) {
+                if (Math.abs(manyGemsMia[i][z].xpos - mia.xpos) <= mia.width &&
+                        Math.abs(manyGemsMia[i][z].ypos - mia.ypos) <= mia.height) {
                     manyGemsMia[i][z].isAlive = false;
                 }
                 if (manyGemsMia[i][z].isAlive) {
@@ -271,8 +233,38 @@ public class MaskWorld implements Runnable, KeyListener {
             }
         }
 
-        Angela.pic = Toolkit.getDefaultToolkit().getImage("Angela.png");
-        Mia.pic = Toolkit.getDefaultToolkit().getImage("Mia.png");
+        // Spike Array for Mia
+        miaSpike = new Spikes[30];
+        for (int i = 0; i < miaSpike.length; i++) {
+            int randomInt3 = (int) (Math.random() * 400 + 401);
+            int randomInt4 = (int) (Math.random() * 800 + 1);
+            miaSpike[i] = new Spikes(randomInt4, randomInt3, 10, 10);
+            miaSpike[i].pic = Toolkit.getDefaultToolkit().getImage("Spikes.png");
+            if (Math.abs(miaSpike[i].xpos - mia.xpos) <= mia.width &&
+                    Math.abs(miaSpike[i].ypos - mia.ypos) <= mia.height) {
+                miaSpike[i].isAlive = false;
+            } else {
+                miaSpike[i].isAlive = true;
+            }
+            for (int c = 0; c < miaRandomMaze.walls.length; c++) {
+                if (miaRandomMaze.walls[c] != null) {
+                    Rectangle r = new Rectangle(miaRandomMaze.walls[c].rec.x, miaRandomMaze.walls[c].rec.y+400, miaRandomMaze.walls[c].rec.width, miaRandomMaze.walls[c].rec.height);
+                    if (miaSpike[i].rec.intersects(r)) {
+                        miaSpike[i].isAlive = false;
+                    }
+                }
+            }
+            for (int b = 0; b < manyGemsMia.length; b++) {
+                for (int z = 0; z < manyGemsMia[0].length; z++) {
+                    if (miaSpike[i].rec.intersects(manyGemsMia[b][z].rec)){
+                        miaSpike[i].isAlive = false;
+                    }
+                }
+            }
+        }
+
+        angela.pic = Toolkit.getDefaultToolkit().getImage("Angela.png");
+        mia.pic = Toolkit.getDefaultToolkit().getImage("Mia.png");
 
         for (int i = 0; i < manyGemsAngela.length; i++) {
             for (int z = 0; z < manyGemsAngela[0].length; z++) {
@@ -307,12 +299,12 @@ public class MaskWorld implements Runnable, KeyListener {
         boolean AngelawillCollide = false;
         boolean MiawillCollide = false;
 
-        Rectangle AngelanextPosition = Angela.getNextRectangle();
-        Rectangle MianextPosition = Mia.getNextRectangle();
+        Rectangle AngelanextPosition = angela.getNextRectangle();
+        Rectangle MianextPosition = mia.getNextRectangle();
 
-        for (int i = 0; i < AngelarandomMaze.mazeLayout.length; i++) {
-            for (int z = 0; z < AngelarandomMaze.mazeLayout[0].length; z++) {
-                if (AngelarandomMaze.mazeLayout[i][z] == 1) {
+        for (int i = 0; i < angelaRandomMaze.mazeLayout.length; i++) {
+            for (int z = 0; z < angelaRandomMaze.mazeLayout[0].length; z++) {
+                if (angelaRandomMaze.mazeLayout[i][z] == 1) {
                     Rectangle wallTemp = new Rectangle(i * 50, z * 50, 50, 50);
                     if (AngelanextPosition.intersects(wallTemp)) {
                         AngelawillCollide = true;
@@ -323,9 +315,9 @@ public class MaskWorld implements Runnable, KeyListener {
             if (AngelawillCollide) break;
         }
 
-        for (int i = 0; i < MiarandomMaze.mazeLayout.length; i++) {
-            for (int z = 0; z < MiarandomMaze.mazeLayout[0].length; z++) {
-                if (MiarandomMaze.mazeLayout[i][z] == 1) {
+        for (int i = 0; i < miaRandomMaze.mazeLayout.length; i++) {
+            for (int z = 0; z < miaRandomMaze.mazeLayout[0].length; z++) {
+                if (miaRandomMaze.mazeLayout[i][z] == 1) {
                     Rectangle wallTemp = new Rectangle(i * 50, z * 50 + 400, 50, 50);
                     if (MianextPosition.intersects(wallTemp)) {
                         MiawillCollide = true;
@@ -337,13 +329,13 @@ public class MaskWorld implements Runnable, KeyListener {
         }
 
         if (AngelawillCollide == false) {
-            Angela.move();
+            angela.move();
         } else {
             System.out.println("Angela is touching a wall and cannot move");
         }
 
         if (MiawillCollide == false){
-            Mia.move();
+            mia.move();
         } else {
             System.out.println("Mia is touching a wall and cannot move");
         }
@@ -353,10 +345,10 @@ public class MaskWorld implements Runnable, KeyListener {
         //Angela collecting gems
         for (int i = 0; i < manyGemsAngela.length; i++) {
             for (int z = 0; z < manyGemsAngela[0].length; z++) {
-                if (Angela.rec.intersects(manyGemsAngela[i][z].rec)) {
+                if (angela.rec.intersects(manyGemsAngela[i][z].rec)) {
                     if (manyGemsAngela[i][z].isAlive) {
                         manyGemsAngela[i][z].isAlive = false;
-                        Angela.score++;
+                        angela.score++;
                         new SoundFile("gemCollect.wav").play();
                         //gemCollect is here so that it can overlap
                     }
@@ -367,10 +359,10 @@ public class MaskWorld implements Runnable, KeyListener {
         //Mia collecting gems
         for (int i = 0; i < manyGemsMia.length; i++) {
             for (int z = 0; z < manyGemsMia[0].length; z++) {
-                if (Mia.rec.intersects(manyGemsMia[i][z].rec)) {
+                if (mia.rec.intersects(manyGemsMia[i][z].rec)) {
                     if (manyGemsMia[i][z].isAlive) {
                         manyGemsMia[i][z].isAlive = false;
-                        Mia.score++;
+                        mia.score++;
                         new SoundFile("gemCollect.wav").play();
                     }
                 }
@@ -378,40 +370,42 @@ public class MaskWorld implements Runnable, KeyListener {
         }
 
         //Angela & Mia intersecting spikes
-        if (levels == 2) {
-            for (int i = 0; i < Angelaspike.length; i++) {
-                if (Angela.rec.intersects(Angelaspike[i].rec)){
-                    if (Angela.isAlive) {
-                        Angela.isAlive = false;
-                        new SoundFile("Death.wav").play();
-                        System.out.println("Angela died at " + i + " with coords " + Angelaspike[i].rec.x + ", " + Angelaspike[i].rec.y);
-                    }
-                }
-                if (Mia.rec.intersects(Miaspike[i].rec)){
-                    if (Mia.isAlive){
-                        Mia.isAlive = false;
-                        new SoundFile("Death.wav").play();
+        if (levels == 1) {
+            for (int i = 0; i < angelaSpike.length; i++) {
+                if (angelaSpike[i].isAlive) {
+                    if (angela.rec.intersects(angelaSpike[i].rec)) {
+                        themeMusic.pause();
+                        if (angela.isAlive) {
+                            new SoundFile("Death.wav").play();
+                            angela.isAlive = false;
+                        }
                     }
                 }
             }
+            for (int i = 0; i < miaSpike.length; i++) {
+                if (miaSpike[i].isAlive){
+                    if (mia.rec.intersects(miaSpike[i].rec)){
+                        themeMusic.pause();
+                        if (mia.isAlive) {
+                            new SoundFile("Death.wav").play();
+                            angela.isAlive = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (angela.isAlive == false){
+            gameOver = true;
+        }
+        if (mia.isAlive == false){
+            gameOver = true;
         }
     }
 
     public void renderstartscreen(){
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
-        g.drawImage(StartScreenImage, 0,0, WIDTH, HEIGHT, null);
-        g.dispose();
-        bufferStrategy.show();
-    }
-
-    public void renderSpikes(){
-        Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
-        for (int i = 0; i < Angelaspike.length; i++) {
-            g.drawImage(Angelaspike[i].pic, Angelaspike[i].xpos, Angelaspike[i].ypos, 5, 5, null);
-        }
-        for (int i = 0; i < Miaspike.length; i++) {
-            g.drawImage(Miaspike[i].pic, Miaspike[i].xpos,Miaspike[i].ypos, 5, 5, null);
-        }
+        g.drawImage(startScreenImage, 0,0, WIDTH, HEIGHT, null);
         g.dispose();
         bufferStrategy.show();
     }
@@ -424,11 +418,11 @@ public class MaskWorld implements Runnable, KeyListener {
         Font font2 = new Font("SanSerif", Font.BOLD, 12 );
         g.setFont(font1);
         g.setColor(Color.white);
-        g.drawString("Player 1: " + Angela.score, 875, 100);
-        g.drawString("Player 2: " + Mia.score, 875, 150);
+        g.drawString("Player 1: " + angela.score, 875, 100);
+        g.drawString("Player 2: " + mia.score, 875, 150);
 
-        AngelarandomMaze.draw(g, 0);
-        MiarandomMaze.draw(g, 400);
+        angelaRandomMaze.draw(g, 0);
+        miaRandomMaze.draw(g, 400);
 
         for (int i = 0; i < manyGemsAngela.length; i++) {
             for (int z = 0; z < manyGemsAngela[0].length; z++) {
@@ -450,27 +444,33 @@ public class MaskWorld implements Runnable, KeyListener {
 
 
 
-        if (Mia.isAlive) {
-            g.drawImage(Mia.pic, Mia.xpos, Mia.ypos, Mia.width, Mia.height, null);
+        if (mia.isAlive) {
+            g.drawImage(mia.pic, mia.xpos, mia.ypos, mia.width, mia.height, null);
         }
 
-        if (Angela.isAlive) {
-            g.drawImage(Angela.pic, Angela.xpos, Angela.ypos, Angela.width, Angela.height, null);
+        if (angela.isAlive) {
+            g.drawImage(angela.pic, angela.xpos, angela.ypos, angela.width, angela.height, null);
         }
 
-        if (Angela.score == totalAliveAngelaGems || Mia.score == totalAliveMiaGems) {
+        if (angela.score == totalAliveAngelaGems || mia.score == totalAliveMiaGems) {
             gameOver = true;
         }
 
-        if (levels == 2) {
-//            renderSpikes();
-            for (int i = 0; i < Angelaspike.length; i++) {
-                g.drawImage(Angelaspike[i].pic, Angelaspike[i].xpos, Angelaspike[i].ypos, 50, 50, null);
-                g.setColor(Color.pink);
-                g.drawRect(Angelaspike[i].rec.x, Angelaspike[i].rec.y, Angelaspike[i].rec.width, Angelaspike[i].rec.height);
+        if (levels >= 1 && angelaSpike != null) {
+            // Spike Array for Angela
+            for (int i = 0; i < angelaSpike.length; i++) {
+                if (angelaSpike[i].isAlive == true) {
+                    g.drawImage(angelaSpike[i].pic, angelaSpike[i].xpos, angelaSpike[i].ypos, angelaSpike[i].width, angelaSpike[i].height, null);
+                }
             }
-            for (int i = 0; i < Miaspike.length; i++) {
-                g.drawImage(Miaspike[i].pic, Miaspike[i].xpos,Miaspike[i].ypos, 5, 5, null);
+        }
+        if (levels >=1 && miaSpike != null) {
+            // Spike Array for Mia
+            for (int i = 0; i < miaSpike.length; i++) {
+                if (miaSpike[i].isAlive == true){
+//                g.drawRect(Miaspike[i].rec.x, Miaspike[i].rec.y, Miaspike[i].rec.width, Miaspike[i].rec.height);
+                    g.drawImage(miaSpike[i].pic, miaSpike[i].xpos, miaSpike[i].ypos, miaSpike[i].width, miaSpike[i].height, null);
+                }
             }
         }
 
@@ -484,10 +484,10 @@ public class MaskWorld implements Runnable, KeyListener {
             g.drawString("Next Level: Shift", 850, 490);
 
             g.setFont(font1);
-            if (Angela.score > Mia.score) {
+            if (angela.score > mia.score) {
                 g.setColor(new Color(189, 227, 250));
                 g.drawString("Player 1 Won", 850, 420);
-            } else if (Angela.score == Mia.score) {
+            } else if (angela.score == mia.score) {
                 g.drawString("You tied", 850, 420);
             } else {
                 g.setColor(new Color(250, 230, 250));
@@ -534,34 +534,34 @@ public class MaskWorld implements Runnable, KeyListener {
     }
 
     public void checkKeys() {
-        if (Angela.up) {
-            Angela.dy = -4;
-        } else if (Angela.down) {
-            Angela.dy = 4;
+        if (angela.up) {
+            angela.dy = -4;
+        } else if (angela.down) {
+            angela.dy = 4;
         } else {
-            Angela.dy = 0;
+            angela.dy = 0;
         }
-        if (Angela.left) {
-            Angela.dx = -4;
-        } else if (Angela.right) {
-            Angela.dx = 4;
+        if (angela.left) {
+            angela.dx = -4;
+        } else if (angela.right) {
+            angela.dx = 4;
         } else {
-            Angela.dx = 0;
+            angela.dx = 0;
         }
 
-        if (Mia.up) {
-            Mia.dy = -4;
-        } else if (Mia.down) {
-            Mia.dy = 4;
+        if (mia.up) {
+            mia.dy = -4;
+        } else if (mia.down) {
+            mia.dy = 4;
         } else {
-            Mia.dy = 0;
+            mia.dy = 0;
         }
-        if (Mia.left) {
-            Mia.dx = -4;
-        } else if (Mia.right) {
-            Mia.dx = 4;
+        if (mia.left) {
+            mia.dx = -4;
+        } else if (mia.right) {
+            mia.dx = 4;
         } else {
-            Mia.dx = 0;
+            mia.dx = 0;
         }
     }
 
@@ -573,31 +573,29 @@ public class MaskWorld implements Runnable, KeyListener {
         int keyCode = e.getKeyCode();
         System.out.println("key code: " + keyCode);
 
-        if (keyCode == 38) Angela.up = true;
-        if (keyCode == 40) Angela.down = true;
-        if (keyCode == 37) Angela.left = true;
-        if (keyCode == 39) Angela.right = true;
+        if (keyCode == 38) angela.up = true;
+        if (keyCode == 40) angela.down = true;
+        if (keyCode == 37) angela.left = true;
+        if (keyCode == 39) angela.right = true;
 
-        if (keyCode == 87) Mia.up = true;
-        if (keyCode == 83) Mia.down = true;
-        if (keyCode == 65) Mia.left = true;
-        if (keyCode == 68) Mia.right = true;
+        if (keyCode == 87) mia.up = true;
+        if (keyCode == 83) mia.down = true;
+        if (keyCode == 65) mia.left = true;
+        if (keyCode == 68) mia.right = true;
 
         if (keyCode == 32) startscreen = false;
 
         if (keyCode == 10 && gameOver == true) {
+            System.out.println("Game is restarting (pressed return)");
             restartGame();
         }
 
         if (keyCode == 16) {
             levels++;
-            if (levels == 2){
+            if (levels == 1){
                 level2();
             }
-            System.out.println("Level" + levels);
         }
-
-        //&& gameOver == true
 
     }
 
@@ -605,14 +603,14 @@ public class MaskWorld implements Runnable, KeyListener {
     public void keyReleased(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
-        if (keyCode == 38) Angela.up = false;
-        if (keyCode == 40) Angela.down = false;
-        if (keyCode == 37) Angela.left = false;
-        if (keyCode == 39) Angela.right = false;
+        if (keyCode == 38) angela.up = false;
+        if (keyCode == 40) angela.down = false;
+        if (keyCode == 37) angela.left = false;
+        if (keyCode == 39) angela.right = false;
 
-        if (keyCode == 87) Mia.up = false;
-        if (keyCode == 83) Mia.down = false;
-        if (keyCode == 65) Mia.left = false;
-        if (keyCode == 68) Mia.right = false;
+        if (keyCode == 87) mia.up = false;
+        if (keyCode == 83) mia.down = false;
+        if (keyCode == 65) mia.left = false;
+        if (keyCode == 68) mia.right = false;
     }
 }
